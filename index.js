@@ -24,7 +24,7 @@ for (const folder of folders) {
   }
 }
 
-client.once("ready", () => {
+client.once("clientReady", () => {
   console.log(`Bot已上線 ${client.user.tag}`)
 })
 
