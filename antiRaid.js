@@ -1,39 +1,15 @@
-module.exports = (client)=>{
+module.exports = (client) => {
+  const userMessages = new Map();
 
-const spamMap=new Map()
-
-client.on("messageCreate",msg=>{
-
- if(msg.author.bot) return
-
- const now=Date.now()
-
- if(!spamMap.has(msg.author.id)){
-
-  spamMap.set(msg.author.id,{count:1,time:now})
-  return
-
- }
-
- const data=spamMap.get(msg.author.id)
-
- if(now-data.time<3000){
-
-  data.count++
-
-  if(data.count>5){
-
-   msg.member.timeout(60000,"Spam")
-   msg.channel.send(`${msg.author} 因刷頻被禁言`)
-
-  }
-
- }else{
-
-  spamMap.set(msg.author.id,{count:1,time:now})
-
- }
-
-})
-
-}
+  client.on("messageCreate", msg => {
+    if (msg.author.bot) return;
+    const now = Date.now();
+    const arr = userMessages.get(msg.author.id) || [];
+    arr.push(now);
+    userMessages.set(msg.author.id, arr.filter(t => now - t < 5000)); // 5秒內訊息
+    if (userMessages.get(msg.author.id).length > 5) { // 超過 5 則視為刷屏
+      msg.channel.send(`<@${msg.author.id}> 請不要刷屏！`);
+      msg.delete().catch(()=>{});
+    }
+  });
+};
